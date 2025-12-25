@@ -7,24 +7,51 @@ header-includes:
 \begin{titlepage}
 \thispagestyle{empty} 
 \centering
-\vspace*{2cm}
 
-{\Huge \textbf{LSTM-based Khmer Text Style Transfer Using Representation Learning}}\par
-\vspace{1cm}
-
-\begin{tabular}{ l c }
-Pel Bunkhloem & e2021 \\
-Pheth Soriyuon & e2021 \\
-Phoeun Rajame & e2021 \\
-Phoeurn Kimhor & e2021 \\
-Phorn Sreypov & e2021 \\
-Yin Sambat & e2021 \\
+\begin{tabular}{p{0.25\textwidth} p{0.5\textwidth} p{0.25\textwidth}}
+\includegraphics[width=0.15\textwidth]{itc.png} & 
+\centering \makebox[0.5\textwidth]{\Large \textbf{Institute of Technology of Cambodia}} &
+\includegraphics[width=0.2\textwidth]{ams_t.png} \\[0.2cm]
+& \centering \makebox[0.5\textwidth]{\Large \textbf{Department of Applied Mathematics and Statistics}} &
 \end{tabular}
 
-{\large Institute of Technology of Cambodia}\par
-\vspace{1.5cm}
 
-{\large December 2025}\par
+\vspace{2cm}
+
+{\Huge \textbf{LSTM-based Khmer Text Style Transfer Using Representation Learning}}\par
+
+\begin{center}
+{\Large Subject: Natural Language Processing (NLP)} \\
+\end{center}
+
+\begin{center} 
+{\large
+\begin{tabular}{ l c }
+\textbf{Name of Students} & \textbf{ID} \\
+\hline
+PEL Bunkhloem & e20201314 \\
+PHETH Soriyuon & e20210674 \\
+PHOEUN Rajame & e20211748 \\
+PHOEURN Kimhor & e20210823 \\
+PHORN Sreypov & e20210166 \\
+YIN Sambat & e20210138 \\
+\end{tabular}
+}
+\end{center}
+
+
+\vspace{1cm} 
+\begin{flushleft} 
+Lecturers: \textbf{Dr. KHON Vanny (Course)} \\
+\hspace{1.45cm} \textbf{Mr. TOUCH Sopheak (TP)}
+\end{flushleft} 
+
+\vfill
+
+\begin{center} 
+\textbf{Academic Year 2025 - 2026 }
+\end{center}
+
 \end{titlepage}
 
 
@@ -53,11 +80,29 @@ This is a **representation learning problem**, as the encoder LSTM learns hidden
 
 # 2. Proposed Solution
 
+We use an **encoder-decoder LSTM** for Khmer style transfer, adopting a **pretraining + fine-tuning approach** to improve performance on limited paired data.
+
+## Pretraining
+
+Before fine-tuning, we **pretrained a single LSTM** on a large corpus of general Khmer text. The pretraining task was **self-reconstruction** \((X \to X)\), meaning that given a sequence \(X = (x_1, x_2, \dots, x_T)\), the model attempts to rewrite it.  
+
+- Pretraining loss:
+
+\[
+\mathcal{L}_{pretrain}(\theta) = - \sum_{X \in \mathcal{C}} \sum_{t=1}^{T} \log P(x_t \mid x_1, \dots, x_{t-1}; \theta)
+\]
+
+- Here, \(\theta\) includes all LSTM weights and biases.  
+- Purpose: learn **robust Khmer token embeddings and sequence representations**.  
+
+The pretrained LSTM weights are then **used to initialize the encoder and/or decoder** of the style-transfer encoder-decoder model, giving the model a good starting point.
+
+
 ## Model Architecture
 
-We use an **encoder-decoder LSTM**:
-
 ### Encoder LSTM
+
+The encoder reads the input normal-style sentence \(X\) and generates **hidden states** \(h_t\) and **cell states** \(c_t\):
 
 \[
 \begin{aligned}
@@ -70,26 +115,33 @@ h_t &= o_t \odot \tanh(c_t)
 \end{aligned}
 \]
 
-- \(c_t\) is the **cell state** storing long-term information.  
-- \(h_t\) is the **hidden state** representing current content information.
+- \(c_t\) stores long-term information.  
+- \(h_t\) represents the content of the input sentence.  
+- Encoder weights can be **partially or fully initialized** with pretrained LSTM weights.
 
 ### Decoder LSTM
 
-The decoder generates each token conditioned on previous outputs and the final encoder states:
+The decoder generates the royal-style target sequence \(Y = (y_1, \dots, y_{T'})\) token by token:
 
 \[
-P(y_t \mid y_{<t}, X) = \text{Softmax}(W s_t + b)
+P(y_t \mid y_{<t}, X; \theta) = \text{Softmax}(W s_t + b)
 \]
 
-where \(s_t\) is the decoder hidden state at step \(t\).
+- \(s_t\) = decoder hidden state at step \(t\)  
+- Each token depends on previous outputs and encoder representations.  
+- Decoder weights can also be initialized with pretrained LSTM weights.
 
-### Loss Function
 
-The model is trained using **negative log-likelihood**:
+## Fine-Tuning for Style Transfer
+
+The fine-tuning loss is **negative log-likelihood** over the paired dataset \(\mathcal{D}\):
 
 \[
-\mathcal{L}(\theta) = - \sum_{(X, Y) \in \mathcal{D}} \sum_{t=1}^{T'} \log P(y_t \mid y_{<t}, X; \theta)
+\mathcal{L}_{finetune}(\theta) = - \sum_{(X, Y) \in \mathcal{D}} \sum_{t=1}^{T'} \log P(y_t \mid y_1, \dots, y_{t-1}, X; \theta)
 \]
+
+- Fine-tuning adapts pretrained weights \(\theta\) to the **style transfer task**.  
+- The model learns to **rewrite normal Khmer sentences into royal style**, while preserving content.
 
 
 # 3. Challenges and Mitigations
