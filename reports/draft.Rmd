@@ -1,8 +1,12 @@
 ---
-output: pdf_document
-header-includes:
-  - \usepackage{graphicx}
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+header-includes: \usepackage{graphicx}
 ---
+
 
 \begin{titlepage}
 \thispagestyle{empty} 
@@ -54,28 +58,83 @@ Lecturers: \textbf{Dr. KHON Vanny (Course)} \\
 
 \end{titlepage}
 
+# 1. Introduction
 
-# 1. Problem Statement
+The Khmer language employs multiple sociolinguistic registers that vary according to the social status and role of the person being addressed. These registers include **រាជសព្ទ (Royal language)** used when addressing or referring to the King, **សង្ឃសព្ទ (Monk language)** used for Buddhist monks, and polite or respectful speech used when addressing elders. Each register is characterized by distinct vocabulary choices and linguistic conventions, making correct usage essential for cultural and social appropriateness.
 
-The task is to transfer text from a **source style** to a **target style** while preserving content. Formally, let:
+The objective of this project is to develop an automated system capable of converting standard Khmer words or sentences into their corresponding sociolinguistic forms. This task can be viewed as a form of *style transfer* in natural language processing, where the semantic meaning of the input text is preserved while the linguistic style is transformed.
 
-- \(X = (x_1, x_2, \dots, x_T)\) denote the input sequence in the source style.  
-- \(Y = (y_1, y_2, \dots, y_{T'})\) denote the target sequence in the desired style.  
-- \(f_\theta\) be the function implemented by our seq2seq LSTM, parameterized by \(\theta\).
+For example, a commonly used verb such as **"ញ៉ាំ"** (to eat) should be accurately transformed into:
 
-We aim to model the conditional distribution:
+- **"សោយ"** when referring to a King  
+- **"ឆាន់"** when referring to a Monk  
+- **"ពិសា"** when addressing or referring to an elder
+
+Achieving such transformations requires the model to understand both contextual meaning and sociolinguistic rules embedded within the Khmer language.
+
+To address this challenge, the project explores the use of deep learning–based sequence models, particularly **Recurrent Neural Networks (RNNs)**, which are well-suited for learning sequential patterns in text. By training the model on parallel datasets consisting of standard Khmer text and its corresponding formalized versions, the system aims to learn appropriate mappings between different linguistic registers.
+
+This project contributes to Khmer language processing by supporting automated formalization, promoting correct language usage in digital applications, and addressing the challenges of style transfer in a low-resource language setting.
+
+
+
+
+
+# 2. Problem Statement
+
+## 2.1 Definition of the Problem
+
+The Khmer language contains multiple sociolinguistic registers that depend on the social status of the subject being referenced. Among these, **Royal Khmer (រាជសព្ទ)** represents the most formal register and differs significantly from normal Khmer text in terms of vocabulary usage and stylistic expression.
+
+The objective of this project is to develop an automated text transformation system that converts **normal Khmer text into Royal Khmer text**. Due to limited time and resources, the scope of this study is restricted to a **single transformation direction**, namely from normal text to royal text. Other transformations, such as monk language or elder-respectful language, are not considered.
+
+A major challenge of this problem is the **lack of publicly available labeled datasets** for Khmer sociolinguistic style transfer. Consequently, all training data must be **manually labeled**, which significantly limits the size of the dataset. Initial experimental results indicate that the model is not yet able to consistently produce correct royal-style text, often generating partially correct or stylistically inaccurate outputs. These observations highlight the difficulty of the task under low-resource conditions.
+
+---
+
+## 2.2 Mathematical Formulation
+
+The task is formulated as a **sequence-to-sequence style transfer problem**, where an input sentence in normal Khmer is transformed into its corresponding royal-style sentence while preserving semantic content.
+
+Let:
+
+- \( X = (x_1, x_2, \dots, x_T) \) denote the input sequence in normal Khmer  
+- \( Y = (y_1, y_2, \dots, y_{T'}) \) denote the output sequence in Royal Khmer  
+- \( f_\theta \) denote the encoder–decoder LSTM model parameterized by \( \theta \)
+
+The conditional probability of generating the target sequence given the input is modeled as:
 
 \[
 P(Y \mid X; \theta) = \prod_{t=1}^{T'} P(y_t \mid y_1, \dots, y_{t-1}, X; \theta)
 \]
 
-The objective is to find \(\theta^*\) that maximizes the likelihood of the target sequences in the dataset \(\mathcal{D}\):
+The optimal parameters \( \theta^* \) are obtained by maximizing the log-likelihood over the labeled dataset \( \mathcal{D} \):
 
 \[
 \theta^* = \arg\max_\theta \sum_{(X, Y) \in \mathcal{D}} \log P(Y \mid X; \theta)
 \]
 
-This is a **representation learning problem**, as the encoder LSTM learns hidden states \(h_t\) that represent the content of the input sequence in a way that can be decoded into the target style.
+This formulation treats Khmer style transfer as a **representation learning problem**, where the encoder learns latent representations of the input sentence that can be decoded into the royal linguistic register.
+
+---
+
+## 2.3 Explanation of Terms and Notation
+
+- \( X \): Input sequence of tokens representing normal Khmer text  
+- \( Y \): Target sequence of tokens representing Royal Khmer text  
+- \( x_t \): The \(t\)-th token in the input sequence  
+- \( y_t \): The \(t\)-th token in the output sequence  
+- \( T \), \( T' \): Lengths of the input and output sequences  
+- \( \mathcal{D} \): Manually labeled dataset of paired normal–royal Khmer sentences  
+- \( \theta \): Trainable parameters of the encoder–decoder LSTM model  
+- \( f_\theta \): Sequence-to-sequence function learned by the model  
+- \( h_t \): Encoder hidden state representing contextual information at time step \(t\)  
+
+---
+
+## Remarks on Current Model Performance
+
+Based on early experimental results, the model does not yet reliably perform correct style conversion. While some semantic content is preserved, royal-specific vocabulary and stylistic markers are frequently missing or incorrectly generated. These limitations are primarily attributed to the small size of the manually labeled dataset, limited training time, and the inherent complexity of Khmer royal language conventions.
 
 
 # 2. Proposed Solution
