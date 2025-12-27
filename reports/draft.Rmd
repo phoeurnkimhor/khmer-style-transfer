@@ -117,7 +117,7 @@ h_t &= o_t \odot \tanh(c_t)
 
 - \(c_t\) stores long-term information.  
 - \(h_t\) represents the content of the input sentence.  
-- Encoder weights can be **partially or fully initialized** with pretrained LSTM weights.
+- Encoder weights can be initialized with pretrained LSTM weights.
 
 ### Decoder LSTM
 
@@ -144,16 +144,3 @@ The fine-tuning loss is **negative log-likelihood** over the paired dataset \(\m
 - The model learns to **rewrite normal Khmer sentences into royal style**, while preserving content.
 
 
-# 3. Challenges and Mitigations
-
-1. **Long sequences:**  
-   - LSTM mitigates vanishing gradient issues, but very long sequences can still cause information loss.  
-   - *Mitigation:* Use bidirectional LSTM encoder to capture context from both directions.
-
-2. **Content preservation vs style transfer:**  
-   - The decoder sometimes alters content when applying the target style.  
-   - *Mitigation:* Apply attention mechanism to let the decoder focus on relevant encoder hidden states.
-
-3. **Limited parallel data:**  
-   - Perfect source-target pairs are scarce.  
-   - *Mitigation:* Pretrain the LSTM encoder-decoder on a language modeling task before fine-tuning on style transfer data.
