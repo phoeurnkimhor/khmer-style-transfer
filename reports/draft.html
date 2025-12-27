@@ -1624,71 +1624,104 @@ display: none;
 
 
 <div id="introduction" class="section level1">
-<h1>1. Introduction</h1>
-<p>The Khmer language employs multiple sociolinguistic registers that
-vary according to the social status and role of the person being
-addressed. These registers include <strong>រាជសព្ទ (Royal
-language)</strong> used when addressing or referring to the King,
-<strong>សង្ឃសព្ទ (Monk language)</strong> used for Buddhist monks, and
-polite or respectful speech used when addressing elders. Each register
-is characterized by distinct vocabulary choices and linguistic
-conventions, making correct usage essential for cultural and social
-appropriateness.</p>
-<p>The objective of this project is to develop an automated system
-capable of converting standard Khmer words or sentences into their
-corresponding sociolinguistic forms. This task can be viewed as a form
-of <em>style transfer</em> in natural language processing, where the
-semantic meaning of the input text is preserved while the linguistic
-style is transformed.</p>
-<p>For example, a commonly used verb such as <strong>“ញ៉ាំ”</strong> (to
-eat) should be accurately transformed into:</p>
+<h1>Introduction</h1>
+<div id="background-and-motivation" class="section level2">
+<h2>1.1 Background and Motivation</h2>
+<p>The :contentReference<span index="0">oaicite:0</span> employs
+multiple sociolinguistic registers that reflect the social status and
+role of the person being addressed. Among these registers,
+<strong>រាជសព្ទ (Royal language)</strong> is of particular cultural and
+linguistic importance, as it is exclusively used when addressing or
+referring to the King. This register is characterized by specialized
+vocabulary and strict linguistic conventions that differ significantly
+from standard or plain Khmer usage.</p>
+<p>In modern digital communication and language technology applications,
+proper use of royal language is often challenging. Most existing text
+processing systems treat Khmer as a single uniform style and do not
+account for sociolinguistic variation. As a result, incorrect or
+inappropriate register usage frequently occurs in written content,
+educational materials, and automated systems. This creates a strong
+motivation to develop computational approaches that can automatically
+convert plain Khmer text into its correct royal form while preserving
+the original meaning and cultural appropriateness.</p>
+<hr />
+</div>
+<div id="overview-of-representation-learning" class="section level2">
+<h2>1.2 Overview of Representation Learning</h2>
+<p>Representation learning is a fundamental concept in contemporary
+natural language processing (NLP), enabling models to learn meaningful
+linguistic features directly from data rather than relying on manually
+defined rules. Through distributed representations such as word and
+sentence embeddings, models can capture semantic relationships,
+contextual usage, and syntactic patterns in text.</p>
+<p>Sequence-based deep learning models, particularly Recurrent Neural
+Networks (RNNs), are well suited for language transformation tasks
+because they process text sequentially and can model dependencies across
+words. In the context of stylistic transformation, representation
+learning allows the model to learn systematic differences between plain
+and royal Khmer, such as vocabulary substitutions and structural
+variations. By training on parallel corpora consisting of plain-text
+inputs and their royal-language equivalents, the model can learn to
+generate linguistically appropriate royal expressions while maintaining
+semantic consistency.</p>
+<hr />
+</div>
+<div id="scope-and-objectives-of-the-study" class="section level2">
+<h2>1.3 Scope and Objectives of the Study</h2>
+<p>The scope of this study is <strong>strictly limited to the
+transformation of standard, plain Khmer text into the royal (រាជសព្ទ)
+register</strong>. Other sociolinguistic registers, such as monk
+language (សង្ឃសព្ទ) or polite speech used for elders, are intentionally
+excluded to maintain a focused and well-defined research objective.</p>
+<p>The specific objectives of this study are as follows:</p>
 <ul>
-<li><strong>“សោយ”</strong> when referring to a King<br />
-</li>
-<li><strong>“ឆាន់”</strong> when referring to a Monk<br />
-</li>
-<li><strong>“ពិសា”</strong> when addressing or referring to an elder</li>
+<li>To develop an automated system that converts plain Khmer sentences
+into their corresponding royal-language forms.</li>
+<li>To apply deep learning–based sequence models for sociolinguistic
+style transfer.</li>
+<li>To ensure that the semantic meaning of the input text is preserved
+during transformation.</li>
+<li>To contribute to Khmer language processing research by addressing a
+low-resource language challenge and promoting culturally appropriate
+language use in computational systems.</li>
 </ul>
-<p>Achieving such transformations requires the model to understand both
-contextual meaning and sociolinguistic rules embedded within the Khmer
-language.</p>
-<p>To address this challenge, the project explores the use of deep
-learning–based sequence models, particularly <strong>Recurrent Neural
-Networks (RNNs)</strong>, which are well-suited for learning sequential
-patterns in text. By training the model on parallel datasets consisting
-of standard Khmer text and its corresponding formalized versions, the
-system aims to learn appropriate mappings between different linguistic
+<p>This focused approach establishes a foundational framework that can
+be extended in future work to support additional Khmer sociolinguistic
 registers.</p>
-<p>This project contributes to Khmer language processing by supporting
-automated formalization, promoting correct language usage in digital
-applications, and addressing the challenges of style transfer in a
-low-resource language setting.</p>
+</div>
 </div>
 <div id="problem-statement" class="section level1">
 <h1>2. Problem Statement</h1>
 <div id="definition-of-the-problem" class="section level2">
 <h2>2.1 Definition of the Problem</h2>
 <p>The Khmer language contains multiple sociolinguistic registers that
-depend on the social status of the subject being referenced. Among
-these, <strong>Royal Khmer (រាជសព្ទ)</strong> represents the most formal
-register and differs significantly from normal Khmer text in terms of
-vocabulary usage and stylistic expression.</p>
-<p>The objective of this project is to develop an automated text
-transformation system that converts <strong>normal Khmer text into Royal
-Khmer text</strong>. Due to limited time and resources, the scope of
-this study is restricted to a <strong>single transformation
-direction</strong>, namely from normal text to royal text. Other
+vary according to the social status of the person being referenced.
+Among these registers, <strong>Royal Khmer (រាជសព្ទ)</strong> represents
+the highest and most formal level of language use. It differs
+substantially from normal Khmer text in terms of vocabulary selection,
+verb usage, and overall stylistic conventions.</p>
+<p>The core problem addressed in this study is the development of an
+automated text transformation system capable of converting
+<strong>normal Khmer text into Royal Khmer text</strong>. This task can
+be viewed as a constrained form of linguistic style transfer, where the
+semantic meaning of the original sentence must be preserved while its
+linguistic style is transformed to conform to royal usage. To maintain a
+clear and manageable research focus, the scope of this work is
+<strong>strictly limited to a single transformation direction: from
+normal text to royal text</strong>. Other sociolinguistic
 transformations, such as monk language or elder-respectful language, are
-not considered.</p>
-<p>A major challenge of this problem is the <strong>lack of publicly
-available labeled datasets</strong> for Khmer sociolinguistic style
-transfer. Consequently, all training data must be <strong>manually
-labeled</strong>, which significantly limits the size of the dataset.
-Initial experimental results indicate that the model is not yet able to
-consistently produce correct royal-style text, often generating
-partially correct or stylistically inaccurate outputs. These
-observations highlight the difficulty of the task under low-resource
-conditions.</p>
+explicitly excluded from this study.</p>
+<p>One of the primary challenges in addressing this problem is the lack
+of publicly available labeled datasets for Khmer sociolinguistic style
+transfer. As a result, all training data must be manually collected and
+annotated, which significantly constrains the size and diversity of the
+dataset. This low-resource setting presents additional difficulties for
+deep learning models, which typically require large amounts of data to
+achieve robust performance. Initial experimental results indicate that
+the model is not yet able to consistently generate correct royal-style
+output, often producing partially correct transformations or
+stylistically inaccurate expressions. These limitations highlight the
+complexity of modeling Royal Khmer under low-resource conditions.</p>
 <hr />
 </div>
 <div id="mathematical-formulation" class="section level2">
