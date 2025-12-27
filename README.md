@@ -17,13 +17,21 @@ The **Khmer Text Style Transformer** is an NLP project dedicated to the preserva
 The project automates the transition between everyday vernacular and the sophisticated, honorific-heavy structures of formal Khmer.
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'edgeLabelBackground':'#ffffff', 'lineColor': '#000000', 'textColor': '#000000'}}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 
+    'primaryColor': '#f0f0f0', 
+    'primaryBorderColor': '#000000', 
+    'lineColor': '#1f77b4',   %% arrows in blue
+    'textColor': '#000000',
+    'edgeLabelBackground':'#f0f0f0'
+}}}%%
 graph LR
     A[Data Acquisition] --> B[Corpus Cleaning]
     B --> C[ML Pre-training]
     C --> D[Domain Fine-tuning]
-    style D fill:#ffffff,stroke:#000000,stroke-width:2px
+
 ```
+
+
 
 
 ---
@@ -79,11 +87,16 @@ khmer-tst/
 The project follows a **two-phase training strategy** to develop a robust Khmer Text Style Transformer. The architecture is based on an **LSTM encoder–decoder framework**, trained progressively to first learn general language structure, then adapt to register-specific nuances.
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'fontFamily': 'Inter', 'lineColor': '#000000', 'textColor': '#000000'}}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 
+    'primaryColor': '#f0f0f0', 
+    'primaryBorderColor': '#000000', 
+    'lineColor': '#1f77b4',   %% arrows in blue
+    'textColor': '#000000',
+    'edgeLabelBackground':'#f0f0f0'
+}}}%%
 graph TD
     A[Unsupervised Pre-Training] --> B[Fine-Tuning on Parallel Corpus]
     B --> C[Inference & Style Transformation]
-    style C fill:#ffffff,stroke:#000000,stroke-width:2px
 ```
 
 
