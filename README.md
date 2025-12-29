@@ -4,13 +4,15 @@
 
 **Bridging the gap between Common Khmer and Royal Registers (Reacheasap)**
 
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue) ![PyTorch](https://img.shields.io/badge/PyTorch-Lightning-red) ![Pandas](https://img.shields.io/badge/Pandas-Data%20Processing-green) ![NumPy](https://img.shields.io/badge/NumPy-Computing-yellow)
+
 </div>
 
 
 
 ## 📖 Overview
 
-The **Khmer Text Style Transformer** is an NLP project dedicated to the preservation and digital transformation of the Khmer language's unique sociolinguistic registers. Specifically, it focuses on **Reacheasap (រាជាសព្ទ)** — the highly formalized royal register used when referring to or addressing the Monarchy, Clergy, and in classical literature.
+The **Khmer Text Style Transformer** is an NLP project dedicated to the preservation and digital transformation of the Khmer language's unique sociolinguistic registers. Specifically, it focuses on **Reacheasap (រាជាសព្ទ)** the highly formalized royal register used when referring to or addressing the Monarchy, Clergy, and in classical literature.
 
 ### 🎯 Project Objectives
 
@@ -31,19 +33,9 @@ graph LR
 
 ```
 
-
-
-
 ---
 
-## ✨ Key Features
 
-* **Register Transformation:** Seamlessly convert text between **Common (ធម្មតា)** and **Royal (រាជាសព្ទ)** registers.
-* **Curated Parallel Corpus:** A high-quality dataset of 690+ manually verified Khmer sentence pairs.
-* **Automated Scrapers:** Custom scripts designed to harvest rich Khmer linguistic data from Wikipedia and traditional folklore sources.
-* **End-to-End Pipeline:** Includes notebooks for everything from data scraping and Masked Language Modeling (MLM) to final fine-tuning.
-
----
 
 ## 📊 Linguistic Dataset
 
@@ -61,24 +53,7 @@ The core of this project is a parallel corpus of **690+ verified pairs**, captur
 | គាត់ (He/She)       | **ព្រះអង្គ**     | His/Her Majesty       |
 | ញ៉ាំ (Eat)          | **សោយ**          | To partake (Royal)    |
 | មក (Come)           | **យាងមក**        | To proceed / arrive   |
-| ឆ្នេរសមុទ្រ (Coast) | **ឆ្នេរមហាសាគរ** | The Great Ocean Coast |
 
----
-
-## 📁 Project Structure
-
-```bash
-khmer-tst/
-├── 📊 data/
-│   ├── general-text.txt       # Unstructured Khmer corpus for pre-training
-│   └── normal-royal.csv       # The parallel register dataset
-├── 🤖 models/                  # Saved weights and transformer checkpoints
-├── 📓 notebooks/
-│   ├── 01-scraping.ipynb      # Wikipedia & Folklore data collection
-│   ├── 02-pre-training.ipynb  # MLM on general Khmer text
-│   └── 03-fine-tuning.ipynb   # Sequence-to-sequence register training
-└── README.md
-```
 
 ---
 
@@ -116,8 +91,6 @@ Train the LSTM to predict the next token in a sequence, allowing it to learn con
 * **Learning Rate:** 0.001
 * **Epochs:** 20–30 (with early stopping)
 
-This phase enables the model to build **general language representations**, capturing grammar and sequential dependencies in Khmer text.
-
 ---
 
 ### **2. Fine-Tuning Phase**
@@ -134,29 +107,20 @@ Adapt the pretrained LSTM for **sequence-to-sequence translation** between regis
 * **Loss Function:** Cross-Entropy Loss
 * **Optimizer:** Adam (lower learning rate for stability)
 * **Evaluation Metrics:** BLEU score, perplexity
-* **Model Checkpointing:** Best model saved as `best_model.pt`
 
-This phase refines the model to capture **register-specific lexical and stylistic transformations**, producing fluent and contextually accurate royal text.
 
----
 
-## 🛠️ Tech Stack
+## 🤗 Hugging Face Resources
 
-* **Linguistic Processing:** Custom tokenization for Khmer script.
-* **Web Tools:** `BeautifulSoup4`for scraping traditional literature.
-* **AI/ML:** `Pandas`, `PyTorch`, and `NumPy` for data processing and LSTM implementation.
+* **Normal to Royal Dataset:** [khmer-tst-normal2royal](https://huggingface.co/datasets/k1mhor/khmer-tst-normal2royal)
+* **Pre-trained Model:** [khmer-pretrained-lstm](https://huggingface.co/k1mhor/khmer-pretrained-lstm)
 
 ---
-
 
 
 <div align="center">
-
-**Preserving Khmer Heritage through Modern Technology**
-
 If this project helps your research, please consider giving it a ⭐!
-
 </div>
 
----
+
 
