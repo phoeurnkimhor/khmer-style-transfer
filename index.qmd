@@ -130,7 +130,102 @@ $$
 
 ---
 
-#### Attention Mechanism
+# Proposed Solution
+## Pre-training
+
+### Data Description
+Data is scraped from:
+
+- Sources: Diverse online Khmer articles (news, blogs, social media, wikipedia).
+- Technique: Selenium.
+
+---
+
+### Data Preparation & Preprocessing
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Dataset Splitting**
+
+* **Total:** Large Khmer corpus.
+* **Filter:** Min length  chars.
+* **Split:** 80% Train | 10% Val | 10% Test.
+:::
+
+::: {.column width="50%"}
+**Cleaning Pipeline**
+
+1. **Remove Noise:** special punctuation (។, ៗ).
+2. **Script Focus:** Strip Latin chars/digits.
+3. **Normalization:** Map redundant glyphs (e.g., ឝ  គ).
+4. **Trim:** Remove extra whitespace.
+:::
+
+:::
+
+---
+
+### Tokenization 
+
+* **Method:** Character-to-index mapping (`stoi`).
+* **Special Tokens:** `<sos>`, `<eos>`, `<pad>`, `<unk>`.
+* **Batching:** Sequences aligned via `pad_sequence`.
+
+---
+
+# Fine-tuning
+
+## Dataset: Normal to Royal Transfer
+
+::: {.columns}
+::: {.column width="50%"}
+**Parallel Corpus**
+
+* **Source:** Scraped from various articles.
+* **Volume:** 793 sentence pairs.
+* **Format:**
+    * **Input:** Normal Khmer (សាមញ្ញ)
+    * **Target:** Royal Khmer (រាជស័ព្ទ)
+:::
+
+::: {.column width="50%"}
+**Data Structure Example**
+
+| Normal | Royal |
+|-------|----------------|
+| លោកបានដើរកាត់តាមឆ្នេរសមុទ្រ | ព្រះអង្គស្តេចយាងកាត់តាមឆ្នេរសមុទ្រ |
+
+:::
+:::
+
+---
+
+## Preprocessing & Alignment
+
+::: {.columns}
+::: {.column width="50%"}
+**Text Cleaning**
+
+- **Punctuation:** Removed traditional markers (៙, ៚, ៖, ។).
+- **Normalization:** Whitespace trimming
+:::
+
+::: {.column width="50%"}
+**Tokenization**
+
+- **Level:** Character-level mapping (`stoi`).
+- **Wrapping:** Added `<sos>` and `<eos>` to every sequence.
+- **Splitting Strategy:**
+    - **Train:** 80%
+    - **Validation:** 10%
+    - **Test:** 10%
+:::
+:::
+
+
+
+## Attention Mechanism
 
 The mechanism begins by calculating how well each encoder state $h_s^{enc}$ matches the current decoder needs.
 
@@ -148,27 +243,7 @@ $$c_t = \sum_{s=1}^{T} \alpha_{t,s} h_s^{enc}$$
 **Final Prediction:** The decoder hidden state $h_t^{dec}$ is updated with $c_t$, and the next character is predicted:
 $$P(y_t \mid y_{<t}, X) = \text{Softmax}(W_{hy} h_t^{dec} + b_y)$$
 
----
-
-## Experimental Summary
-
-- Two char-level Seq2Seq models pre-trained on different corpora:
-  - **General text** (news, public modern Khmer)
-  - **Folktale text** (classical Khmer folktales)
-- Shared pre-training hyperparameters: Hidden 256, Layers 2, Batch 32, LR 0.001, Optimizer Adam, Epochs 50, Loss Cross-entropy.
-- Outcome: General-text model showed higher predictive accuracy and better coverage of modern Khmer syntax/vocabulary.
-
----
-
-## Fine-tuning Setup
-
-- Base model: **General-text** pre-trained Seq2Seq.
-- Hyperparameters: LR 0.001, Batch 16, Epochs 100, Optimizer Adam, Loss Cross-entropy.
-- Special mechanism: **Attention** to improve alignment and decoding.
-
----
-
-## Results
+# Results
 
 **Pre-training BLEU (test):**
 
@@ -179,10 +254,9 @@ $$P(y_t \mid y_{<t}, X) = \text{Softmax}(W_{hy} h_t^{dec} + b_y)$$
 
 **Fine-tuning (samples):** BLEU scores range **0.73–0.87** across representative sentences, with outputs reflecting royal style and coherent structure.
 
----
+| Generated Output | Actual Output | BLEU |
+|-------|-----------------|------------|
+| ព្រះអង្គទ្រង់បានសម្លាប់មន្ត្រីក្បត់ហើយ | ព្រះអង្គទ្រង់រៀបចំរាជាភិសេកថ្វាយព្រះរាជ | 0.87 |
+| ព្រះនាងទ្រង់ប្រសូតនៅថ្ងៃទី ១ នី ២ នាក់ | ព្រះនាងថ្វាយព្រះសន្យាថានឹងថែរក្សាព្រះកិ | 0.79 |
 
-## Discussion
 
-- **Corpus choice matters:** General-text pre-training yields richer representations that transfer better.
-- **Folktale bias:** Archaic/repetitive patterns reduce generalization and BLEU.
-- **Attention helps:** Improves alignment and word order, especially for longer Khmer sentences.

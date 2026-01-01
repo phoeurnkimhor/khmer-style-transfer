@@ -1119,36 +1119,125 @@ P\!\left(y_t \mid y_1, \dots, y_{t-1}, X; \theta\right)
 </section>
 <section class="slide level2">
 
-<h4 data-number="1.1.0.1" id="attention-mechanism"><span class="header-section-number">1.1.0.1</span> Attention Mechanism</h4>
+</section></section>
+<section>
+<section id="proposed-solution" class="title-slide slide level1 center" data-number="2">
+<h1><span class="header-section-number">2</span> Proposed Solution</h1>
+
+</section>
+<section id="pre-training" class="slide level2" data-number="2.1">
+<h2><span class="header-section-number">2.1</span> Pre-training</h2>
+<h3 data-number="2.1.1" id="data-description"><span class="header-section-number">2.1.1</span> Data Description</h3>
+<p>Data is scraped from:</p>
+<ul>
+<li>Sources: Diverse online Khmer articles (news, blogs, social media, wikipedia).</li>
+<li>Technique: Selenium.</li>
+</ul>
+</section>
+<section class="slide level2 scrollable">
+
+<h3 data-number="2.1.2" id="data-preparation-preprocessing"><span class="header-section-number">2.1.2</span> Data Preparation &amp; Preprocessing</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Dataset Splitting</strong></p>
+<ul>
+<li><strong>Total:</strong> Large Khmer corpus.</li>
+<li><strong>Filter:</strong> Min length chars.</li>
+<li><strong>Split:</strong> 80% Train | 10% Val | 10% Test.</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><strong>Cleaning Pipeline</strong></p>
+<ol type="1">
+<li><strong>Remove Noise:</strong> special punctuation (។, ៗ).</li>
+<li><strong>Script Focus:</strong> Strip Latin chars/digits.</li>
+<li><strong>Normalization:</strong> Map redundant glyphs (e.g., ឝ គ).</li>
+<li><strong>Trim:</strong> Remove extra whitespace.</li>
+</ol>
+</div></div>
+</section>
+<section class="slide level2">
+
+<h3 data-number="2.1.3" id="tokenization"><span class="header-section-number">2.1.3</span> Tokenization</h3>
+<ul>
+<li><strong>Method:</strong> Character-to-index mapping (<code>stoi</code>).</li>
+<li><strong>Special Tokens:</strong> <code>&lt;sos&gt;</code>, <code>&lt;eos&gt;</code>, <code>&lt;pad&gt;</code>, <code>&lt;unk&gt;</code>.</li>
+<li><strong>Batching:</strong> Sequences aligned via <code>pad_sequence</code>.</li>
+</ul>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="fine-tuning" class="title-slide slide level1 center" data-number="3">
+<h1><span class="header-section-number">3</span> Fine-tuning</h1>
+
+</section>
+<section id="dataset-normal-to-royal-transfer" class="slide level2" data-number="3.1">
+<h2><span class="header-section-number">3.1</span> Dataset: Normal to Royal Transfer</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Parallel Corpus</strong></p>
+<ul>
+<li><strong>Source:</strong> Scraped from various articles.</li>
+<li><strong>Volume:</strong> 793 sentence pairs.</li>
+<li><strong>Format:</strong>
+<ul>
+<li><strong>Input:</strong> Normal Khmer (សាមញ្ញ)</li>
+<li><strong>Target:</strong> Royal Khmer (រាជស័ព្ទ)</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><strong>Data Structure Example</strong></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Normal</th>
+<th>Royal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>លោកបានដើរកាត់តាមឆ្នេរសមុទ្រ</td>
+<td>ព្រះអង្គស្តេចយាងកាត់តាមឆ្នេរសមុទ្រ</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="preprocessing-alignment" class="slide level2" data-number="3.2">
+<h2><span class="header-section-number">3.2</span> Preprocessing &amp; Alignment</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Text Cleaning</strong></p>
+<ul>
+<li><strong>Punctuation:</strong> Removed traditional markers (៙, ៚, ៖, ។).</li>
+<li><strong>Normalization:</strong> Whitespace trimming</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><strong>Tokenization</strong></p>
+<ul>
+<li><strong>Level:</strong> Character-level mapping (<code>stoi</code>).</li>
+<li><strong>Wrapping:</strong> Added <code>&lt;sos&gt;</code> and <code>&lt;eos&gt;</code> to every sequence.</li>
+<li><strong>Splitting Strategy:</strong>
+<ul>
+<li><strong>Train:</strong> 80%</li>
+<li><strong>Validation:</strong> 10%</li>
+<li><strong>Test:</strong> 10%</li>
+</ul></li>
+</ul>
+</div></div>
+</section>
+<section id="attention-mechanism" class="slide level2" data-number="3.3">
+<h2><span class="header-section-number">3.3</span> Attention Mechanism</h2>
 <p>The mechanism begins by calculating how well each encoder state <span class="math inline">\(h_s^{enc}\)</span> matches the current decoder needs.</p>
 <p><strong>Alignment Score:</strong> Measures the relevance of input <span class="math inline">\(s\)</span> at decoding step <span class="math inline">\(t\)</span>: <span class="math display">\[e_{t,s} = h_{t-1}^{dec} \cdot h_s^{enc}\]</span></p>
 <p><strong>Attention Weight:</strong> Normalizes scores into a probability distribution using Softmax: <span class="math display">\[\alpha_{t,s} = \frac{\exp(e_{t,s})}{\sum_{k=1}^{T} \exp(e_{t,k})}\]</span></p>
 <p>The model then extracts relevant information to generate the final character.</p>
 <p><strong>Context Vector (<span class="math inline">\(c_t\)</span>):</strong> A weighted sum of all encoder hidden states: <span class="math display">\[c_t = \sum_{s=1}^{T} \alpha_{t,s} h_s^{enc}\]</span></p>
 <p><strong>Final Prediction:</strong> The decoder hidden state <span class="math inline">\(h_t^{dec}\)</span> is updated with <span class="math inline">\(c_t\)</span>, and the next character is predicted: <span class="math display">\[P(y_t \mid y_{&lt;t}, X) = \text{Softmax}(W_{hy} h_t^{dec} + b_y)\]</span></p>
-</section>
-<section id="experimental-summary" class="slide level2" data-number="1.2">
-<h2><span class="header-section-number">1.2</span> Experimental Summary</h2>
-<ul>
-<li>Two char-level Seq2Seq models pre-trained on different corpora:
-<ul>
-<li><strong>General text</strong> (news, public modern Khmer)</li>
-<li><strong>Folktale text</strong> (classical Khmer folktales)</li>
-</ul></li>
-<li>Shared pre-training hyperparameters: Hidden 256, Layers 2, Batch 32, LR 0.001, Optimizer Adam, Epochs 50, Loss Cross-entropy.</li>
-<li>Outcome: General-text model showed higher predictive accuracy and better coverage of modern Khmer syntax/vocabulary.</li>
-</ul>
-</section>
-<section id="fine-tuning-setup" class="slide level2" data-number="1.3">
-<h2><span class="header-section-number">1.3</span> Fine-tuning Setup</h2>
-<ul>
-<li>Base model: <strong>General-text</strong> pre-trained Seq2Seq.</li>
-<li>Hyperparameters: LR 0.001, Batch 16, Epochs 100, Optimizer Adam, Loss Cross-entropy.</li>
-<li>Special mechanism: <strong>Attention</strong> to improve alignment and decoding.</li>
-</ul>
-</section>
-<section id="results" class="slide level2" data-number="1.4">
-<h2><span class="header-section-number">1.4</span> Results</h2>
+</section></section>
+<section id="results" class="title-slide slide level1 center" data-number="4">
+<h1><span class="header-section-number">4</span> Results</h1>
 <p><strong>Pre-training BLEU (test):</strong></p>
 <table class="caption-top">
 <thead>
@@ -1169,16 +1258,34 @@ P\!\left(y_t \mid y_1, \dots, y_{t-1}, X; \theta\right)
 </tbody>
 </table>
 <p><strong>Fine-tuning (samples):</strong> BLEU scores range <strong>0.73–0.87</strong> across representative sentences, with outputs reflecting royal style and coherent structure.</p>
-</section>
-<section id="discussion" class="slide level2" data-number="1.5">
-<h2><span class="header-section-number">1.5</span> Discussion</h2>
-<ul>
-<li><strong>Corpus choice matters:</strong> General-text pre-training yields richer representations that transfer better.</li>
-<li><strong>Folktale bias:</strong> Archaic/repetitive patterns reduce generalization and BLEU.</li>
-<li><strong>Attention helps:</strong> Improves alignment and word order, especially for longer Khmer sentences.</li>
-</ul>
+<table class="caption-top">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 47%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Generated Output</th>
+<th>Actual Output</th>
+<th>BLEU</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ព្រះអង្គទ្រង់បានសម្លាប់មន្ត្រីក្បត់ហើយ</td>
+<td>ព្រះអង្គទ្រង់រៀបចំរាជាភិសេកថ្វាយព្រះរាជ</td>
+<td>0.87</td>
+</tr>
+<tr class="even">
+<td>ព្រះនាងទ្រង់ប្រសូតនៅថ្ងៃទី ១ នី ២ នាក់</td>
+<td>ព្រះនាងថ្វាយព្រះសន្យាថានឹងថែរក្សាព្រះកិ</td>
+<td>0.79</td>
+</tr>
+</tbody>
+</table>
 
-</section></section>
+</section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">
