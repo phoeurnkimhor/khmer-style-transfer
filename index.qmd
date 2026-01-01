@@ -4,76 +4,50 @@ author:
   - "Pel Bunkhloem Phoeurn Kimhor"
   - "Pheth Soriyuon Phorn Sreypov"
   - "Phoeun Rajame Yin Sambat"
-  - "**Supervised by:** Dr. KHON Vanny"
+  - "<br>**Supervised by:**<br> Dr. KHON Vanny Mr. TOUCH Sopheak"
 date: "02 January 2026"
+date-format: "DD/MM/YYYY"
 format: 
   revealjs:
     slide-number: true
-    transition: slide
-    scrollable: true
     theme: white
     progress: true
     smaller: true
+    scrollable: true
     embed-resources: true
     number-sections: true
+    include-in-header:
+      - text: |
+          <style>
 
-include-in-header:
-  - text: |
-      <style>
-      .title {
-        font-size: 1.5em !important; /* Adjust this number to make it smaller */
-      }
-      .reveal .slide-background.present::before {
-        content: '';
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 120px;
-        height: 120px;
-        background-image: url('../assets/itc.png');
-        background-size: contain;
-        background-repeat: no-repeat;
-        z-index: 10;
-      }
-      .reveal .slide-background.present::after {
-        content: '';
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 200px;
-        height: 200px;
-        background-image: url('../assets/ams_t.png');
-        background-size: contain;
-        background-repeat: no-repeat;
-        z-index: 10;
-      }
-      .reveal .slides > section.present {
-        position: relative;
-      }
-      .title-logos {
-        position: absolute;
-        top: 10px;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        padding: 0 20px;
-        box-sizing: border-box;
-        z-index: 20;
-        pointer-events: none;
-      }
-      .title-logos img {
-        height: 100px;
-        width: auto;
-      }
-      .reveal h1 {
-        font-size: 1.5em !important;
-      }
-      .reveal h2,
-      .reveal h3 {
-        font-size: 0.7em;
-      }
-      </style>
+          .reveal::before {
+            content: ''; position: absolute; top: 15px; left: 15px;
+            width: 70px; height: 70px;
+            background: url('../assets/itc.png') no-repeat center;
+            background-size: contain; z-index: 1000;
+          }
+          .reveal::after {
+            content: ''; position: absolute; top: 15px; right: 15px;
+            width: 130px; height: 130px;
+            background: url('../assets/ams_t.png') no-repeat center;
+            background-size: contain; z-index: 1000;
+          }
+
+          .reveal h1.title {
+            font-size: 1.8em !important;
+            margin-top: 100px !important;
+            color: #1a365d; /* Professional Dark Blue */
+          }
+          
+          .reveal h2 { font-size: 1.5em; color: #1a365d; border-bottom: 2px solid #1a365d; }
+          .reveal h3 { font-size: 1.1em; color: #2c5282; }
+   
+          .author-table { width: 100%; margin-top: 30px; border-collapse: collapse; }
+          .author-table td { padding: 10px; font-size: 0.8em; vertical-align: top; }
+          </style>
+
 ---
+
 
 # Problem Statement
 
@@ -94,7 +68,6 @@ Let:
 <div style="flex: 0.65;">
 
 <strong style="color: #1f77b4;">Conditional Probability</strong>
-
 
 $$
 P(Y \mid X; \theta)
@@ -130,28 +103,19 @@ $$
 
 ---
 
-# Proposed Solution
-## Pre-training
+# Pre-training
 
-### Data Description
-Data is scraped from:
+## Data Description
 
 - Sources: Diverse online Khmer articles (news, blogs, social media, wikipedia).
-- Technique: Selenium.
+- Technology to scrape: Selenium.
+- Count of data: 470,000 rows
 
 ---
 
-### Data Preparation & Preprocessing
+## Data Preparation & Preprocessing
 
 ::: {.columns}
-
-::: {.column width="50%"}
-**Dataset Splitting**
-
-* **Total:** Large Khmer corpus.
-* **Filter:** Min length  chars.
-* **Split:** 80% Train | 10% Val | 10% Test.
-:::
 
 ::: {.column width="50%"}
 **Cleaning Pipeline**
@@ -162,17 +126,36 @@ Data is scraped from:
 4. **Trim:** Remove extra whitespace.
 :::
 
+::: {.column width="50%"}
+**Dataset Splitting**
+
+* **Filter:** Min length  chars.
+* **Split:** 80% Train | 10% Val | 10% Test.
+:::
 :::
 
 ---
 
-### Tokenization 
+## Tokenization 
 
 * **Method:** Character-to-index mapping (`stoi`).
 * **Special Tokens:** `<sos>`, `<eos>`, `<pad>`, `<unk>`.
 * **Batching:** Sequences aligned via `pad_sequence`.
 
 ---
+
+## Architecture Overview
+### LSTM Autoencoder Architecture
+![Diagram: LSTM Autoencoder Architecture](assets/LSTM_Autoencoder.PNG)
+
+- **Limited parallel data**: Only 793 normal ↔ royal sentence pairs
+- **Language foundation**: Model must understand Khmer structure before learning style  
+- **Unsupervised approach**: Autoencoder learns from 30K general Khmer sentences
+
+---
+
+### Workflow of LSTM Autoencoder
+![Diagram: Flow from Input through Encoder to Lower-Dimensional Space, then through Decoder back to Output](assets/Model.jpg)
 
 # Fine-tuning
 
@@ -223,8 +206,6 @@ Data is scraped from:
 :::
 :::
 
-
-
 ## Attention Mechanism
 
 The mechanism begins by calculating how well each encoder state $h_s^{enc}$ matches the current decoder needs.
@@ -252,11 +233,11 @@ $$P(y_t \mid y_{<t}, X) = \text{Softmax}(W_{hy} h_t^{dec} + b_y)$$
 | General Text | **30.1** |
 | Folktale Text| **9.4**  |
 
-**Fine-tuning (samples):** BLEU scores range **0.73–0.87** across representative sentences, with outputs reflecting royal style and coherent structure.
+**Fine-tuning (samples):** 
 
 | Generated Output | Actual Output | BLEU |
 |-------|-----------------|------------|
-| ព្រះអង្គទ្រង់បានសម្លាប់មន្ត្រីក្បត់ហើយ | ព្រះអង្គទ្រង់រៀបចំរាជាភិសេកថ្វាយព្រះរាជ | 0.87 |
-| ព្រះនាងទ្រង់ប្រសូតនៅថ្ងៃទី ១ នី ២ នាក់ | ព្រះនាងថ្វាយព្រះសន្យាថានឹងថែរក្សាព្រះកិ | 0.79 |
+| ព្រះមហាក្សត្រប្រទានព្រះរាជបន្ទូលថា បាន  | ព្រះមហាក្សត្រប្រទានព្រះរាជទ្រព្យជួយរាស្ | 0.79 |
+| ព្រះនាងមិនឱ្យមានព្រះរាជបុត្រពីព្រះនាងមា |ព្រះនាងមិនឱ្យភិលៀងធ្វើព្រះរាជកិច្ចជំនួស | 0.73 |
 
 
