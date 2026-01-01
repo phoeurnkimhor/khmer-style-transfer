@@ -2,7 +2,7 @@
 format:
   pdf:
     pdf-engine: xelatex
-    keep-tex: true
+    keep-tex: False
     title-block-style: none
     number-sections: true
     documentclass: scrartcl
@@ -217,8 +217,3 @@ $$
 - The model learns to **rewrite normal Khmer sentences into royal style**, while preserving content.
 
 
-```{python}
-# import pandas as pd
-
-# df = pd.read_csv
-```

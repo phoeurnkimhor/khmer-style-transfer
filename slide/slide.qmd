@@ -1,0 +1,70 @@
+---
+title: "LSTM-based Khmer Text Style Transfer Using Representation Learning"
+author: 
+  - "Pel Bunkhloem Phoeurn Kimhor"
+  - "Pheth Soriyuon Phorn Sreypov"
+  - "Phoeun Rajame Yin Sambat"
+  - "**Supervised by:** Dr. KHON Vanny"
+date: "02 January 2026"
+format: 
+  revealjs:
+    slide-number: true
+    transition: slide
+    theme: white
+    smaller: true
+    embed-resources: true
+
+include-in-header:
+  - text: |
+      <style>
+      .title {
+        font-size: 1.5em !important; /* Adjust this number to make it smaller */
+      }
+      .reveal .slide-background.present::before {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 120px;
+        height: 120px;
+        background-image: url('itc.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        z-index: 10;
+      }
+      .reveal .slide-background.present::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 200px;
+        height: 200px;
+        background-image: url('ams_t.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        z-index: 10;
+      }
+      .reveal .slides > section.present {
+        position: relative;
+      }
+      .title-logos {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+        box-sizing: border-box;
+        z-index: 20;
+        pointer-events: none;
+      }
+      .title-logos img {
+        height: 100px;
+        width: auto;
+      }
+      </style>
+---
+
+# Heading 1
+
+Hello Sir, Please let me go
