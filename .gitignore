@@ -14,7 +14,10 @@ wheels/
 .xlsx*
 .txt*
 .aux*
-.aux
+report.fdb_latexmk*
 
 models/
 data/
+report_files/
+_build/
+

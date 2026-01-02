@@ -56,7 +56,7 @@ YIN Sambat & e20210138 \\
 \vspace{1cm} 
 \begin{flushleft} 
 Lecturers: \textbf{Dr. KHON Vanny (Course)} \\
-\hspace{1.45cm} \textbf{Mr. TOUCH Sopheak (TP)}
+\hspace{1.7cm} \textbf{Mr. TOUCH Sopheak (TP)}
 \end{flushleft} 
 
 \vfill
@@ -67,48 +67,16 @@ Lecturers: \textbf{Dr. KHON Vanny (Course)} \\
 
 \end{titlepage}
 
-# Introduction
+\newpage
+\pagenumbering{roman} 
+\renewcommand{\contentsname}{Table of Contents}
+\tableofcontents
 
-## Background and Motivation
-
-The Khmer Language employs multiple sociolinguistic registers that reflect the social status and role of the person being addressed. Among these registers, **\khmer{រាជសព្ទ} (Royal language)** is of particular cultural and linguistic importance, as it is exclusively used when addressing or referring to the King. This register is characterized by specialized vocabulary and strict linguistic conventions that differ significantly from standard or plain Khmer usage.
-
-In modern digital communication and language technology applications, proper use of royal language is often challenging. Most existing text processing systems treat Khmer as a single uniform style and do not account for sociolinguistic variation. As a result, incorrect or inappropriate register usage frequently occurs in written content, educational materials, and automated systems. This creates a strong motivation to develop computational approaches that can automatically convert plain Khmer text into its correct royal form while preserving the original meaning and cultural appropriateness.
-
-
-## Overview of Representation Learning
-
-Representation learning is a fundamental concept in contemporary natural language processing (NLP), enabling models to learn meaningful linguistic features directly from data rather than relying on manually defined rules. Through distributed representations such as word and sentence embeddings, models can capture semantic relationships, contextual usage, and syntactic patterns in text.
-
-Sequence-based deep learning models, particularly Recurrent Neural Networks (RNNs), are well suited for language transformation tasks because they process text sequentially and can model dependencies across words. In the context of stylistic transformation, representation learning allows the model to learn systematic differences between plain and royal Khmer, such as vocabulary substitutions and structural variations. By training on parallel corpora consisting of plain-text inputs and their royal-language equivalents, the model can learn to generate linguistically appropriate royal expressions while maintaining semantic consistency.
-
-
-## Scope and Objectives of the Study
-
-The scope of this study is **strictly limited to the transformation of standard, plain Khmer text into the royal (\khmer{រាជសព្ទ}) register**. Other sociolinguistic registers, such as monk language (\khmer{សង្ឃសព្ទ}) or polite speech used for elders, are intentionally excluded to maintain a focused and well-defined research objective.
-
-The specific objectives of this study are as follows:
-
-- To develop an automated system that converts plain Khmer sentences into their corresponding royal-language forms.
-- To apply deep learning–based sequence models for sociolinguistic style transfer.
-- To ensure that the semantic meaning of the input text is preserved during transformation.
-- To contribute to Khmer language processing research by addressing a low-resource language challenge and promoting culturally appropriate language use in computational systems.
-
-This focused approach establishes a foundational framework that can be extended in future work to support additional Khmer sociolinguistic registers.
-
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
 
 # Problem Statement
-
-## Definition of the Problem
-
-The Khmer language contains multiple sociolinguistic registers that vary according to the social status of the person being referenced. Among these registers, **Royal Khmer (\khmer{រាជសព្ទ})** represents the highest and most formal level of language use. It differs substantially from normal Khmer text in terms of vocabulary selection, verb usage, and overall stylistic conventions.
-
-The core problem addressed in this study is the development of an automated text transformation system capable of converting **normal Khmer text into Royal Khmer text**. This task can be viewed as a constrained form of linguistic style transfer, where the semantic meaning of the original sentence must be preserved while its linguistic style is transformed to conform to royal usage. To maintain a clear and manageable research focus, the scope of this work is **strictly limited to a single transformation direction: from normal text to royal text**. Other sociolinguistic transformations, such as monk language or elder-respectful language, are explicitly excluded from this study.
-
-One of the primary challenges in addressing this problem is the lack of publicly available labeled datasets for Khmer sociolinguistic style transfer. As a result, all training data must be manually collected and annotated, which significantly constrains the size and diversity of the dataset. This low-resource setting presents additional difficulties for deep learning models, which typically require large amounts of data to achieve robust performance. Initial experimental results indicate that the model is not yet able to consistently generate correct royal-style output, often producing partially correct transformations or stylistically inaccurate expressions. These limitations highlight the complexity of modeling Royal Khmer under low-resource conditions.
-
-
-## Mathematical Formulation
 
 The task is formulated as a **sequence-to-sequence style transfer problem**, where an input sentence in normal Khmer is transformed into its corresponding royal-style sentence while preserving semantic content.
 
@@ -145,75 +113,315 @@ This formulation treats Khmer style transfer as a **representation learning prob
 - $f_\theta$: Sequence-to-sequence function learned by the model  
 - $h_t$: Encoder hidden state representing contextual information at time step $t$  
 
+# Pre-training
 
-## Remarks on Current Model Performance
+## Data Description
 
-Based on early experimental results, the model does not yet reliably perform correct style conversion. While some semantic content is preserved, royal-specific vocabulary and stylistic markers are frequently missing or incorrectly generated. These limitations are primarily attributed to the small size of the manually labeled dataset, limited training time, and the inherent complexity of Khmer royal language conventions.
+Data is scraped from:
+
+- Sources: Diverse online Khmer articles (news, blogs, social media, wikipedia).
+- Technique: Selenium.
+
+## Data Cleaning and Character-level Processing
+To prepare the text for character-level modeling, the following preprocessing steps were applied:
+
+1. Removing unwanted characters: Zero-width spaces (`\u200b`, `\u200c`, `\u200d`), formatting marks (`\ufeff`), and specific Khmer punctuation (\khmer{។, ៗ, ៖}) were removed.
+
+2. Removing Latin characters and digits: Ensures the model focuses purely on Khmer script.
+
+3. Character normalization: Certain Khmer characters were mapped to reduce redundancy and noise (e.g., \khmer{ឝ → គ}, \khmer{ឞ → ម}).
+
+4. Whitespace trimming: Extra spaces were removed to produce clean character sequences.
 
 
-# Proposed Solution
+## Building Vocabulary
+The model operates at the character level, treating each Khmer character as an individual token.
+- Vocabulary mapping: Characters are converted into numerical indices using a dictionary (stoi).
+Example: {' ': 0, '\khmer{ក}': 1, '\khmer{ខ}': 2, ...}
 
-We use an **encoder-decoder LSTM** for Khmer style transfer, adopting a **pretraining + fine-tuning approach** to improve performance on limited paired data.
+- Special tokens are added to support sequence modeling:
+    - `<sos>`: Start of sequence
+    - `<eos>`: End of sequence
+    - `<pad>`: Padding
+    - `<unk>`: Unknown characters
 
-## Pretraining
+This step converts all text sequences into numerical sequences suitable for PyTorch training.
 
-Before fine-tuning, we **pretrained a single LSTM** on a large corpus of general Khmer text. The pretraining task was **self-reconstruction** $(X \to X)$, meaning that given a sequence $X = (x_1, x_2, \dots, x_T)$, the model attempts to rewrite it.  
+## Padding and Batch Preparation
 
-- Pretraining loss:
+To enable efficient batch processing:
+
+- Sequences within a batch are padded to the same length using the <pad> token.
+
+- PyTorch’s pad_sequence function ensures that all input-target pairs in a batch are aligned.
+
+
+## Architecture Overview
+
+The project adapts a character-level Long Short-Term Memory (LSTM) autoencoder for unsupervised pre-training on Khmer text. The architecture implements an encoder-decoder (Seq2Seq) framework where the encoder compresses input sequences into fixed-dimensional context vectors and the decoder reconstructs original sequences from these compressed representations. An embedding layer handles the mapping of discrete character indices to continuous vector representations.
+
+### Encoder-Decoder Architecture
+
+**Encoder Function**
+
+The bidirectional LSTM encoder processes embedded character sequences to produce condensed representations. Formally:
 
 $$
-\mathcal{L}_{pretrain}(\theta) = - \sum_{X \in \mathcal{C}} \sum_{t=1}^{T} \log P(x_t \mid x_1, \dots, x_{t-1}; \theta)
+(h_T^{\text{enc}}, C_T^{\text{enc}}) = f_{\text{enc}}(e_1, e_2, \ldots, e_T)
 $$
 
-- Here, $\theta$ includes all LSTM weights and biases.  
-- Purpose: learn **robust Khmer token embeddings and sequence representations**.  
+where $h_T^{\text{enc}}, C_T^{\text{enc}} \in \mathbb{R}^{256}$ encapsulate the complete input sequence information.
 
-The pretrained LSTM weights are then **used to initialize the encoder and/or decoder** of the style-transfer encoder-decoder model, giving the model a good starting point.
+**Decoder Function**
 
+The decoder LSTM, initialized with encoder states, generates reconstructed sequences:
 
-## Model Architecture
+$$
+(h_t^{\text{dec}}, C_t^{\text{dec}}) = f_{\text{dec}}(e_{t-1}, h_{t-1}^{\text{dec}}, C_{t-1}^{\text{dec}})
+$$
 
-### Encoder LSTM
+with initial conditions $(h_0^{\text{dec}}, C_0^{\text{dec}}) = (h_T^{\text{enc}}, C_T^{\text{enc}})$. Teacher forcing utilizes ground truth previous characters during training to stabilize learning.
 
-The encoder reads the input normal-style sentence $X$ and generates **hidden states** $h_t$ and **cell states** $c_t$:
+### Mathematical Formulation of LSTM Architecture
+
+The LSTM architecture addresses the vanishing gradient problem in the traditional recurrent neural networks (RNN) through gating mechanisms that regulate information flow. At each timestep $t$, the LSTM cell computes:
+
+**Gating Functions**
 
 $$
 \begin{aligned}
-f_t &= \sigma(W_f x_t + U_f h_{t-1} + b_f) \\
-i_t &= \sigma(W_i x_t + U_i h_{t-1} + b_i) \\
-o_t &= \sigma(W_o x_t + U_o h_{t-1} + b_o) \\
-\tilde{c}_t &= \tanh(W_c x_t + U_c h_{t-1} + b_c) \\
-c_t &= f_t \odot c_{t-1} + i_t \odot \tilde{c}_t \\
-h_t &= o_t \odot \tanh(c_t)
+f_t &= \sigma(W_f \cdot [h_{t-1}, x_t] + b_f) &\text{(Forget Gate)} \\
+i_t &= \sigma(W_i \cdot [h_{t-1}, x_t] + b_i) &\text{(Input Gate)} \\
+o_t &= \sigma(W_o \cdot [h_{t-1}, x_t] + b_o) &\text{(Output Gate)}
 \end{aligned}
 $$
 
-- $c_t$ stores long-term information.  
-- $h_t$ represents the content of the input sentence.  
-- Encoder weights can be initialized with pretrained LSTM weights.
-
-### Decoder LSTM
-
-The decoder generates the royal-style target sequence $Y = (y_1, \dots, y_{T'})$ token by token:
+**Memory Cell Operations**
 
 $$
-P(y_t \mid y_{<t}, X; \theta) = \text{Softmax}(W s_t + b)
+\begin{aligned}
+\tilde{C}_t &= \tanh(W_C \cdot [h_{t-1}, x_t] + b_C) &\text{(Candidate State)} \\
+C_t &= f_t \odot C_{t-1} + i_t \odot \tilde{C}_t &\text{(Cell State Update)} \\
+h_t &= o_t \odot \tanh(C_t) &\text{(Hidden State Output)}
+\end{aligned}
 $$
 
-- $s_t$ = decoder hidden state at step $t$  
-- Each token depends on previous outputs and encoder representations.  
-- Decoder weights can also be initialized with pretrained LSTM weights.
+Here, $\sigma$ denotes the sigmoid activation function constraining outputs to $[0,1]$, $\tanh$ produces outputs in $[-1,1]$, and $\odot$ represents element-wise multiplication. The forget gate $f_t$ modulates retention of previous cell state $C_{t-1}$, while the input gate $i_t$ regulates incorporation of new candidate values $\tilde{C}_t$. The output gate $o_t$ controls exposure of the cell state to subsequent layers.
+
+# Fine-Tuning
+
+## Dataset: Normal to Royal Transfer
 
 
-## Fine-Tuning for Style Transfer
+### Parallel Corpus
+* **Source:** Scraped from Wikipedia, Fresh News, and various Khmer articles.
+* **Volume:** 793 high-quality cleaned sentence pairs.
+* **Format:**
+    * **Input:** Normal Khmer (\khmer{សាមញ្ញ})
+    * **Target:** Royal Khmer (\khmer{រាជស័ព្ទ})
 
-The fine-tuning loss is **negative log-likelihood** over the paired dataset $\mathcal{D}$:
 
-$$
-\mathcal{L}_{finetune}(\theta) = - \sum_{(X, Y) \in \mathcal{D}} \sum_{t=1}^{T'} \log P(y_t \mid y_1, \dots, y_{t-1}, X; \theta)
-$$
+### Data Structure Example
+| normal | royal |
+|-------|----------------|
+| \khmer{លោកបានដើរកាត់តាមឆ្នេរសមុទ្រ} | \khmer{ព្រះអង្គស្តេចយាងកាត់តាមឆ្នេរសមុទ្រ}  |
 
-- Fine-tuning adapts pretrained weights $\theta$ to the **style transfer task**.  
-- The model learns to **rewrite normal Khmer sentences into royal style**, while preserving content.
+
+### Preprocessing 
+
+**Text Cleaning**
+
+* **Special Chars:** Stripped `\u200b` (ZWSP), `\u200c` (ZWNJ).
+* **Punctuation:** Removed traditional markers (\khmer{៙, ៚, ៖, ។}).
+* **Script Filter:** Used Regex to retain only Khmer range (`\u1780-\u17FF`).
+* **Normalization:** Whitespace trimming and collapsing.
+
+
+**Tokenization & Splitting**
+
+* **Level:** Character-level mapping (`stoi`).
+* **Wrapping:** Added `<sos>` and `<eos>` to every sequence.
+* **Splitting Strategy:**
+    * **Train:** 80%
+    * **Validation:** 10%
+    * **Test:** 10%
+
+
+
+### Character Numericalization
+
+To process the script, characters are mapped to indices:
+
+| Token | Index | Category |
+|-------|-------|----------|
+| ` ` | 0 | Whitespace |
+| \khmer{ក} | 1 | Consonant |
+| \khmer{ខ} | 2 | Consonant |
+| `<sos>` | 80 | Start of Sequence |
+| `<pad>` | 0 | Padding |
+
+
+**Padding Logic:** All sequences in a batch are aligned to the length of the longest sentence using the `<pad>` token to ensure matrix compatibility during PyTorch training.
+
+## Adaptation of Model Architecture
+
+The original character-level autoencoder is adapted into an **attention-based Seq2Seq architecture** tailored for Normal-to-Royal Khmer style transfer.
+
+### Encoder Reuse
+
+* The encoder is an LSTM trained on a large Khmer corpus.
+* It captures fundamental grammatical and structural properties of the language.
+* Encoder weights are reused and initially frozen to prevent catastrophic forgetting.
+
+### Decoder and Style Adaptation
+
+* A new LSTM decoder is initialized with a separate embedding layer.
+* The decoder is initialized using the final hidden and cell states of the encoder.
+* This initialization provides a compact semantic representation of the Normal Khmer input.
+
+### Attention Mechanism
+
+An attention layer is incorporated to handle:
+
+* Long-range dependencies
+* Complex mappings where a single Normal word may correspond to multiple Royal terms
+
+The attention mechanism allows the decoder to dynamically focus on relevant parts of the source sentence at each decoding step.
+
+### Teacher Forcing
+
+A teacher forcing ratio of **0.5** is used during training. At each decoding step:
+
+* 50% of the time, the decoder uses the ground-truth character.
+* 50% of the time, it uses its own previous prediction.
+
+## Mathematical Description of the Model
+
+### Encoder Representation
+
+Given a Normal Khmer input sequence:
+
+$$x = (x_1, x_2, \dots, x_n)$$
+
+the encoder produces hidden states:
+
+$$h_t^{enc} = \text{LSTM}_{enc}(E(x_t), h_{t-1}^{enc})$$
+
+where $E(x_t)$ is the embedding of the $t$-th character.
+
+### Attention Mechanism
+
+For each decoding step $t$, attention weights are computed as follows.
+
+**Alignment score:**
+
+$$e_{t,i} = \text{score}(h_{t-1}^{dec}, h_i^{enc})$$
+
+**Attention weights:**
+
+$$\alpha_{t,i} = \frac{\exp(e_{t,i})}{\sum_{k=1}^{n} \exp(e_{t,k})}$$
+
+**Context vector:**
+
+$$c_t = \sum_{i=1}^{n} \alpha_{t,i} h_i^{enc}$$
+
+### Decoder and Output Prediction
+
+The decoder updates its hidden state using the previous output and the context vector:
+
+$$h_t^{dec} = \text{LSTM}_{dec}([E(y_{t-1}); c_t], h_{t-1}^{dec})$$
+
+The probability distribution over the output vocabulary is:
+
+$$P(y_t \mid y_{<t}, x) = \text{Softmax}(W(h_t^{dec} + c_t) + b)$$
+
+where $W$ and $b$ are learnable parameters.
+
+### Loss Function
+
+The model is trained using **Cross-Entropy Loss**:
+
+$$\mathcal{L} = - \sum_{t=1}^{T} \log P(y_t^* \mid y_{<t}^*, x)$$
+
+# Experimental Steps
+
+## Pre-training Phase
+
+Two separate Seq2Seq models were trained at the character level using different text sources.
+
+- **Model A (General text):** trained on modern Khmer sentences from news and public text sources.  
+- **Model B (Folktale text):** trained on classical Khmer folktales.  
+
+| Parameter | Value |
+|------------|--------|
+| Hidden Size | 256 |
+| Layers | 2 |
+| Batch Size | 32 |
+| Learning Rate | 0.001 |
+| Optimizer | Adam |
+| Epochs | 50 |
+| Loss Function | Cross-entropy loss |
+
+The general-text pre-trained model demonstrated significantly higher predictive accuracy, indicating a more comprehensive understanding of modern Khmer syntax and vocabulary.
+
+
+## Fine-tuning Phase
+
+The general-text pre-trained model was fine-tuned on a Khmer style transfer dataset.  
+Fine-tuning hyperparameters:
+
+| Parameter | Value |
+|-----------|-------|
+| Learning Rate | 0.001 |
+| Batch Size | 16 |
+| Epochs | 100 |
+| Optimizer | Adam |
+| Loss Function | Cross-entropy loss |
+| Special Mechanism | Attention |
+
+
+# Results
+
+## Quantitative Results
+
+After pre-training, each model’s pre-training BLEU score was computed on a held-out test set.
+
+| Model | Pre-training BLEU on Test (%) |
+|--------|-----------------------|
+| General Text | **30.1** |
+| Folktale Text | **9.4** |
+
+After fine-tuning the **general text** pre-trained model, we test it on the test set. Average BLEU: 40%, here are some examples:
+
+\begin{table}[ht]
+\centering
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.1}
+\scriptsize
+\begin{tabular}{p{0.42\textwidth} p{0.42\textwidth} p{0.12\textwidth}}
+	\textbf{Generated Output} & \textbf{Actual Output} & \textbf{BLEU Score} \\
+\hline
+\khmer{ព្រះមហាក្សត្រប្រទានព្រះរាជបន្ទូលថា បាន} & \khmer{ព្រះមហាក្សត្រប្រទានព្រះរាជទ្រព្យជួយរាស្} & 0.79 \\
+\khmer{ព្រះនាងមិនឱ្យមានព្រះរាជបុត្រពីព្រះនាងមា} & \khmer{ព្រះនាងមិនឱ្យភិលៀងធ្វើព្រះរាជកិច្ចជំនួស} & 0.73
+\end{tabular}
+\end{table}
+
+## Discussion
+
+The experimental results show that the choice of pre-training corpus directly affects fine-tuning performance in Khmer text style transfer.  
+
+Pre-training on general modern Khmer text exposed the model to a richer vocabulary, more varied sentence structures, and diverse linguistic patterns. This led to stronger encoder representations that transferred well to the style transfer task. In contrast, pre-training on folktales, while grammatically valid, introduced stylistic biases. Folktale language relies heavily on archaic expressions and repetitive narrative formulas, which reduced the model's ability to generalize to modern royal style constructions. This explains the significantly lower BLEU scores observed with folktale based pre training.
+
+Beyond pre training, several factors limit the model's performance on the fine tuning task itself.
+
+First, the parallel dataset is very small. We have only 793 sentence pairs. This is insufficient for a neural sequence to sequence model to learn the full range of mappings between normal and royal Khmer. As a result, the model depends heavily on frequent patterns in the training data. For example, when the input describes someone speaking or making a statement, the model often defaults to the phrase \khmer{ព្រះរាជបន្ទូលថា} (royally declared that...), even when the correct royal rendering should involve giving aid, traveling, or performing a ritual. Without enough examples of diverse royal usages, the model reuses the most common template it has seen.
+
+Second, the model operates at the character level, generating one Khmer character at a time. While this avoids the challenges of word segmentation in Khmer, it also makes the task more fragile. A single early error, such as choosing the wrong consonant, can steer the entire output toward an incorrect word. For instance, once the model begins generating \khmer{បន្ទូល} instead of \khmer{ទ្រព្យ}, it is locked into that lexical path and cannot recover. This explains why many outputs start with correct royal markers but end in incomplete, malformed, or semantically incorrect phrases.
+
+Third, the use of teacher forcing during training creates a mismatch between training and inference. During training, the decoder sometimes receives the ground truth previous character, but at test time it must rely entirely on its own predictions. If an early prediction is wrong, the error propagates through the rest of the sequence. In some cases, this leads to hallucinated content, such as generating \khmer{ព្រះរាជបុត្រ} (royal child) when the original sentence mentions no such person, simply because the model followed a familiar but inappropriate royal pattern.
+
+In short, the model succeeds at applying surface level royal markers like \khmer{ព្រះអង្គ} or \khmer{ទ្រង់}, but it often fails to preserve the original meaning in a way that is both accurate and culturally appropriate. This limitation is not due to a flaw in the model architecture, but rather to the inherent difficulty of the task given the limited data and the deep linguistic differences between normal and royal Khmer registers.
+
+
 
 
