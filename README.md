@@ -115,12 +115,20 @@ Adapt the pretrained LSTM for **sequence-to-sequence translation** between regis
 * **Normal to Royal Dataset:** [khmer-tst-normal2royal](https://huggingface.co/datasets/k1mhor/khmer-tst-normal2royal)
 * **Pre-trained Model:** [khmer-pretrained-lstm](https://huggingface.co/k1mhor/khmer-pretrained-lstm)
 
----
+
+## Contributors
+
+| Avatar | Name | GitHub |
+|--------|------|--------|
+| ![BunkhloemPEL](https://github.com/BunkhloemPEL.png?size=40) | PEL Bunkhloem | [BunkhloemPEL](https://github.com/BunkhloemPEL) |
+| ![Pheth Soriyuon](https://github.com/PHETH-SORIYUON.png?size=40) | PHETH Soriyuon | [PHETH-SORIYUON](https://github.com/PHETH-SORIYUON) |
+| ![jame-xplore](https://github.com/jame-xplore.png?size=40) | PHOEUN Rajame | [jame-xplore](https://github.com/jame-xplore) |
+| ![phoeurnkimhor](https://github.com/phoeurnkimhor.png?size=40) | PHOEURN Kimhor | [phoeurnkimhor](https://github.com/phoeurnkimhor) |
+| ![Povsundra](https://github.com/Povsundra.png?size=40) | PHORN SREYPOV | [Povsundra](https://github.com/Povsundra) |
+| ![Petit-x-garcon](https://github.com/Petit-x-garcon.png?size=40) | YIN Sambat | [Petit-x-garcon](https://github.com/Petit-x-garcon) |
 
 
-<div align="center">
-If this project helps your research, please consider giving it a ⭐!
-</div>
+
 
 
 
